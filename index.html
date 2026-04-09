@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For You</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow: hidden;
+      font-family: 'Cormorant Garamond', serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 20%, #f3e5f5 40%, #e8eaf6 60%, #fce4ec 80%, #fff3e0 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 20s ease infinite;
+      position: relative;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      25% { background-position: 100% 0%; }
+      50% { background-position: 100% 100%; }
+      75% { background-position: 0% 100%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Soft bokeh overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 120px 120px at 15% 20%, rgba(255, 182, 193, 0.3) 0%, transparent 70%),
+        radial-gradient(ellipse 80px 80px at 80% 30%, rgba(221, 160, 221, 0.25) 0%, transparent 70%),
+        radial-gradient(ellipse 100px 100px at 50% 80%, rgba(255, 218, 185, 0.3) 0%, transparent 70%),
+        radial-gradient(ellipse 60px 60px at 25% 70%, rgba(176, 196, 222, 0.2) 0%, transparent 70%),
+        radial-gradient(ellipse 90px 90px at 75% 75%, rgba(255, 192, 203, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Floating elements canvas */
+    .floating-elements {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .floater {
+      position: absolute;
+      animation: floatUp linear infinite;
+      opacity: 0;
+      filter: blur(0.5px);
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) rotate(0deg) scale(0.5);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.7;
+      }
+      90% {
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-10vh) rotate(360deg) scale(1);
+        opacity: 0;
+      }
+    }
+
+    /* Gentle sparkle particles */
+    .sparkle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 6px 2px rgba(255, 200, 220, 0.6);
+      animation: sparkleFloat linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes sparkleFloat {
+      0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+      }
+      20% { opacity: 1; transform: translateY(80vh) scale(1); }
+      80% { opacity: 1; }
+      100% {
+        transform: translateY(-10vh) scale(0);
+        opacity: 0;
+      }
+    }
+
+    /* Main content */
+    .content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      max-width: 700px;
+      padding: 3rem 2.5rem;
+      animation: fadeInUp 2s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Decorative line */
+    .ornament {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      opacity: 0.6;
+    }
+
+    .ornament-line {
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #c48b9f, transparent);
+    }
+
+    .ornament-symbol {
+      font-size: 1.2rem;
+      color: #c48b9f;
+    }
+
+    .greeting {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.4rem;
+      color: #b07a8e;
+      letter-spacing: 2px;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: softFadeIn 2s ease-out 0.5s forwards;
+    }
+
+    .quote-container {
+      position: relative;
+      padding: 1rem 0;
+    }
+
+    .quote-mark {
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem;
+      color: rgba(196, 139, 159, 0.15);
+      line-height: 1;
+      position: absolute;
+      top: -1.5rem;
+      left: -0.5rem;
+      user-select: none;
+    }
+
+    .quote {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.75rem;
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.8;
+      color: #5a3d4a;
+      letter-spacing: 0.5px;
+      opacity: 0;
+      animation: softFadeIn 2s ease-out 1s forwards;
+      transition: opacity 0.8s ease;
+    }
+
+    @keyframes softFadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .author {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      color: #a07a8a;
+      margin-top: 1.5rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: softFadeIn 2s ease-out 1.5s forwards;
+    }
+
+    .ornament-bottom {
+      margin-top: 2rem;
+      margin-bottom: 0;
+    }
+
+    .date-display {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.85rem;
+      color: #c0a0b0;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-top: 2.5rem;
+      opacity: 0;
+      animation: softFadeIn 2s ease-out 2s forwards;
+    }
+
+    /* Petal drifting */
+    .petal {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: radial-gradient(ellipse at 30% 30%, #ffb6c1, #ff69b4);
+      border-radius: 50% 0 50% 50%;
+      opacity: 0;
+      animation: petalDrift linear infinite;
+    }
+
+    @keyframes petalDrift {
+      0% {
+        transform: translate(0, -10vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% { opacity: 0.5; }
+      90% { opacity: 0.5; }
+      100% {
+        transform: translate(100px, 110vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* Glassmorphism card */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 24px;
+      box-shadow:
+        0 8px 32px rgba(180, 120, 150, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      padding: 3.5rem 3rem;
+    }
+
+    /* Heart beat at the bottom */
+    .heartbeat {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.2rem;
+      color: #e8899a;
+      animation: heartPulse 1.5s ease-in-out infinite;
+      z-index: 10;
+      opacity: 0;
+      animation: softFadeIn 2s ease-out 2.5s forwards, heartPulse 1.5s ease-in-out 2.5s infinite;
+    }
+
+    @keyframes heartPulse {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      15% { transform: translateX(-50%) scale(1.3); }
+      30% { transform: translateX(-50%) scale(1); }
+      45% { transform: translateX(-50%) scale(1.2); }
+      60% { transform: translateX(-50%) scale(1); }
+    }
+
+    @media (max-width: 600px) {
+      .content {
+        padding: 1.5rem 1rem;
+      }
+      .glass-card {
+        padding: 2.5rem 1.5rem;
+        border-radius: 18px;
+      }
+      .quote {
+        font-size: 1.35rem;
+        line-height: 1.7;
+      }
+      .greeting {
+        font-size: 1.2rem;
+      }
+      .ornament-line {
+        width: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="floating-elements" id="floatingElements"></div>
+
+  <div class="content">
+    <div class="glass-card">
+      <div class="ornament">
+        <div class="ornament-line"></div>
+        <div class="ornament-symbol">&hearts;</div>
+        <div class="ornament-line"></div>
+      </div>
+
+      <div class="greeting">A little reminder for you today...</div>
+
+      <div class="quote-container">
+        <div class="quote-mark">&ldquo;</div>
+        <div class="quote" id="dailyQuote"></div>
+      </div>
+
+      <div class="author" id="quoteAuthor"></div>
+
+      <div class="ornament ornament-bottom">
+        <div class="ornament-line"></div>
+        <div class="ornament-symbol">&hearts;</div>
+        <div class="ornament-line"></div>
+      </div>
+
+      <div class="date-display" id="dateDisplay"></div>
+    </div>
+  </div>
+
+  <div class="heartbeat">&hearts;</div>
+
+  <script>
+    // ─── Daily Quotes ───
+    const quotes = [
+      { text: "You are braver than you believe, stronger than you seem, and loved more than you know.", author: "A. A. Milne" },
+      { text: "She remembered who she was and the game changed.", author: "Lalah Delia" },
+      { text: "You carry so much love in your heart. Don't forget to give some to yourself.", author: "For You" },
+      { text: "You are enough. A thousand times enough.", author: "For You" },
+      { text: "The world is a better place because you are in it. Never doubt that.", author: "For You" },
+      { text: "She was powerful not because she wasn't scared, but because she went on so strongly despite the fear.", author: "Atticus" },
+      { text: "You deserve the love you keep trying to give everyone else.", author: "For You" },
+      { text: "There is no force more powerful than a woman determined to rise.", author: "W.E.B. Du Bois" },
+      { text: "You are the poem I never knew how to write, and this life is the story I have always wanted to tell.", author: "For You" },
+      { text: "Beautiful girl, you can do hard things.", author: "For You" },
+      { text: "Your sensitivity is your superpower. Your kindness is your strength.", author: "For You" },
+      { text: "She is clothed in strength and dignity, and she laughs without fear of the future.", author: "Proverbs 31:25" },
+      { text: "You are not fragile. You are a masterpiece — both soft and strong at once.", author: "For You" },
+      { text: "Darling, you feel heavy because you are carrying more strength inside you than you realize.", author: "For You" },
+      { text: "In case no one told you today: you are beautiful, you are loved, you are needed, and you are alive for a reason.", author: "For You" },
+      { text: "Some women fear the fire. Some women simply become it.", author: "R. H. Sin" },
+      { text: "The most beautiful thing a woman can wear is confidence.", author: "Blake Lively" },
+      { text: "You have been assigned this mountain to show others it can be moved.", author: "For You" },
+      { text: "She was unstoppable. Not because she did not have failures or doubts, but because she continued on despite them.", author: "Beau Taplin" },
+      { text: "Your heart is your compass. Trust where it leads you.", author: "For You" },
+      { text: "A flower does not think of competing with the flower next to it. It just blooms.", author: "Zen Shin" },
+      { text: "You are the kind of magic this world truly needs.", author: "For You" },
+      { text: "No one is you, and that is your greatest power.", author: "For You" },
+      { text: "You light up the room just by being in it. Don't ever dim that.", author: "For You" },
+      { text: "She has been through the storm and survived. She will bloom exactly when she is ready.", author: "For You" },
+      { text: "Every day may not be good, but there is something good in every day — and a lot of that good is you.", author: "For You" },
+      { text: "You are not small. You are not stuck. You are just beginning.", author: "For You" },
+      { text: "Your existence makes this whole world softer, warmer, and infinitely more beautiful.", author: "For You" },
+      { text: "She stood in the storm, and when the wind did not blow her way, she adjusted her sails.", author: "Elizabeth Edwards" },
+      { text: "Remind yourself: you have survived every bad day so far. You are doing amazing.", author: "For You" },
+      { text: "The sun watches what I do, but the moon knows all my secrets. And you, you are my sun and my moon.", author: "For You" },
+      { text: "When you can't find the sunshine, be the sunshine. And darling, you always are.", author: "For You" },
+      { text: "You are worth every star in the sky and every flower in the field.", author: "For You" },
+      { text: "She needed a hero, so that's what she became.", author: "For You" },
+      { text: "Your soul is a garden. Keep watering it. Everything beautiful is growing.", author: "For You" },
+      { text: "The way you make people feel is your most beautiful thing about you.", author: "For You" },
+      { text: "Take a deep breath. You are exactly where you need to be.", author: "For You" },
+      { text: "You turned your wounds into wisdom and your struggles into strength. That is extraordinary.", author: "For You" },
+      { text: "Storms make trees take deeper roots. You are growing, even when it doesn't feel like it.", author: "Dolly Parton" },
+      { text: "Be the love you never received. Be the acknowledgment you never got. Be your own everything — because you are worth it.", author: "For You" },
+      { text: "The world is lucky to have someone who feels as deeply as you do.", author: "For You" },
+      { text: "You are the answer to someone's prayer and the reason someone smiles today.", author: "For You" },
+      { text: "Don't be afraid of your own light. The world was waiting for exactly you.", author: "For You" },
+      { text: "She believed she could, so she did.", author: "R. S. Grey" },
+      { text: "Today, just be proud of how far you've come. You have survived so much, and you are still here, still growing.", author: "For You" },
+      { text: "You are a rare edition in a world full of copies. Never change.", author: "For You" },
+      { text: "Your imperfections are marks of authenticity — and that is the beauty of you.", author: "For You" },
+      { text: "If flowers can bloom after a long, cold winter, so can you.", author: "For You" },
+      { text: "The most beautiful women are the ones who light fires in others while still tending to their own flame.", author: "For You" },
+      { text: "I hope you know that every single day, you make the world infinitely more beautiful just by existing.", author: "For You" },
+      { text: "You don't have to be perfect to be wonderful.", author: "For You" },
+      { text: "She wore her scars as her best attire. A stunning dress made of hellfire.", author: "Daniel Saint" },
+      { text: "One day you will look back and see that all along, you were blooming.", author: "Morgan Harper Nichols" },
+      { text: "Be gentle with yourself. You are doing the best you can.", author: "For You" },
+      { text: "You are worthy of all the love your heart can hold, and then some.", author: "For You" },
+      { text: "There's bravery in being soft in a world that sometimes isn't. That takes real strength.", author: "For You" },
+      { text: "Your smile can light up the darkest room. Never underestimate the power you carry.", author: "For You" },
+      { text: "Inhale confidence, exhale doubt. You've got this, today and every day.", author: "For You" },
+      { text: "The stars shine brightest in the darkest nights — and darling, so do you.", author: "For You" },
+      { text: "You are my today and all of my tomorrows.", author: "Leo Christopher" },
+      { text: "She wasn't looking for a knight. She was looking for a sword. And she found it in herself.", author: "Atticus" },
+      { text: "In a world where you can be anything, you chose to be kind. That is strength.", author: "For You" },
+      { text: "Rest if you must, but never give up. Your story is still being written.", author: "For You" },
+      { text: "The most alluring thing a woman can have is confidence. And you, darling, have it in abundance.", author: "For You" },
+      { text: "I know it's hard right now, but I also know you are going to make it. Keep going.", author: "For You" },
+    ];
+
+    // Pick quote based on day of year so it changes daily
+    function getDayOfYear() {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), 0, 0);
+      const diff = now - start;
+      const oneDay = 1000 * 60 * 60 * 24;
+      return Math.floor(diff / oneDay);
+    }
+
+    const todayIndex = getDayOfYear() % quotes.length;
+    const todayQuote = quotes[todayIndex];
+
+    document.getElementById('dailyQuote').textContent = todayQuote.text;
+    document.getElementById('quoteAuthor').textContent = '— ' + todayQuote.author;
+
+    // Format and display date
+    const today = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('dateDisplay').textContent = today.toLocaleDateString('en-US', options);
+
+    // ─── Floating Hearts & Flowers ───
+    const container = document.getElementById('floatingElements');
+
+    const hearts = ['❤', '♥', '💕', '💗', '💖', '🤍', '🩷'];
+    const flowers = ['🌸', '🌷', '🌺', '🪷', '✿', '❀', '🌹'];
+    const petals = ['🌿', '🍃', '✨', '⋆'];
+
+    function randomBetween(a, b) {
+      return Math.random() * (b - a) + a;
+    }
+
+    function createFloatingElement() {
+      const el = document.createElement('div');
+      el.classList.add('floater');
+
+      // Mix of hearts, flowers, petals, sparkles
+      const pool = [...hearts, ...hearts, ...flowers, ...petals];
+      el.textContent = pool[Math.floor(Math.random() * pool.length)];
+
+      const size = randomBetween(0.8, 1.8);
+      const duration = randomBetween(10, 22);
+      const left = randomBetween(0, 100);
+      const delay = randomBetween(0, 8);
+
+      el.style.fontSize = size + 'rem';
+      el.style.left = left + '%';
+      el.style.animationDuration = duration + 's';
+      el.style.animationDelay = delay + 's';
+      el.style.filter = `blur(${randomBetween(0, 1)}px)`;
+
+      container.appendChild(el);
+
+      // Clean up after animation ends
+      setTimeout(() => {
+        el.remove();
+        createFloatingElement();
+      }, (duration + delay) * 1000);
+    }
+
+    // Create initial batch of floating elements
+    for (let i = 0; i < 25; i++) {
+      createFloatingElement();
+    }
+
+    // Create sparkle particles
+    function createSparkle() {
+      const sparkle = document.createElement('div');
+      sparkle.classList.add('sparkle');
+
+      const duration = randomBetween(8, 16);
+      const left = randomBetween(0, 100);
+      const delay = randomBetween(0, 10);
+
+      sparkle.style.left = left + '%';
+      sparkle.style.animationDuration = duration + 's';
+      sparkle.style.animationDelay = delay + 's';
+
+      container.appendChild(sparkle);
+
+      setTimeout(() => {
+        sparkle.remove();
+        createSparkle();
+      }, (duration + delay) * 1000);
+    }
+
+    for (let i = 0; i < 15; i++) {
+      createSparkle();
+    }
+
+    // Create drifting petals
+    function createPetal() {
+      const petal = document.createElement('div');
+      petal.classList.add('petal');
+
+      const duration = randomBetween(12, 25);
+      const left = randomBetween(-5, 105);
+      const delay = randomBetween(0, 15);
+      const size = randomBetween(8, 18);
+
+      petal.style.width = size + 'px';
+      petal.style.height = size + 'px';
+      petal.style.left = left + '%';
+      petal.style.animationDuration = duration + 's';
+      petal.style.animationDelay = delay + 's';
+      petal.style.background = `radial-gradient(ellipse at 30% 30%,
+        hsl(${randomBetween(330, 360)}, ${randomBetween(60,100)}%, ${randomBetween(75,90)}%),
+        hsl(${randomBetween(330, 360)}, ${randomBetween(60,100)}%, ${randomBetween(55,70)}%))`;
+
+      container.appendChild(petal);
+
+      setTimeout(() => {
+        petal.remove();
+        createPetal();
+      }, (duration + delay) * 1000);
+    }
+
+    for (let i = 0; i < 10; i++) {
+      createPetal();
+    }
+  </script>
+</body>
+</html>
