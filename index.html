@@ -258,6 +258,41 @@
       padding: 3.5rem 3rem;
     }
 
+    /* Playlist nav link */
+    .playlist-link {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 100;
+      text-decoration: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.85rem;
+      color: #b07a8e;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      animation: softFadeIn 2s ease-out 2.5s forwards;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .playlist-link:hover {
+      color: #8e5a6e;
+      transform: translateX(3px);
+    }
+
+    .playlist-link svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
     /* Heart beat at the bottom */
     .heartbeat {
       position: fixed;
@@ -302,6 +337,11 @@
   </style>
 </head>
 <body>
+  <a href="playlist.html" class="playlist-link">
+    playlist
+    <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+  </a>
+
   <div class="floating-elements" id="floatingElements"></div>
 
   <div class="content">

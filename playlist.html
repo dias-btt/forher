@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Playlist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      font-family: 'Cormorant Garamond', serif;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 20%, #f3e5f5 40%, #e8eaf6 60%, #fce4ec 80%, #fff3e0 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 20s ease infinite;
+      position: relative;
+      padding: 2rem 1rem 4rem;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      25% { background-position: 100% 0%; }
+      50% { background-position: 100% 100%; }
+      75% { background-position: 0% 100%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 120px 120px at 15% 20%, rgba(255, 182, 193, 0.3) 0%, transparent 70%),
+        radial-gradient(ellipse 80px 80px at 80% 30%, rgba(221, 160, 221, 0.25) 0%, transparent 70%),
+        radial-gradient(ellipse 100px 100px at 50% 80%, rgba(255, 218, 185, 0.3) 0%, transparent 70%),
+        radial-gradient(ellipse 60px 60px at 25% 70%, rgba(176, 196, 222, 0.2) 0%, transparent 70%),
+        radial-gradient(ellipse 90px 90px at 75% 75%, rgba(255, 192, 203, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .floating-elements {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .floater {
+      position: absolute;
+      animation: floatUp linear infinite;
+      opacity: 0;
+      filter: blur(0.5px);
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) rotate(0deg) scale(0.5); opacity: 0; }
+      10% { opacity: 0.7; }
+      90% { opacity: 0.7; }
+      100% { transform: translateY(-10vh) rotate(360deg) scale(1); opacity: 0; }
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 6px 2px rgba(255, 200, 220, 0.6);
+      animation: sparkleFloat linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes sparkleFloat {
+      0% { transform: translateY(100vh) scale(0); opacity: 0; }
+      20% { opacity: 1; transform: translateY(80vh) scale(1); }
+      80% { opacity: 1; }
+      100% { transform: translateY(-10vh) scale(0); opacity: 0; }
+    }
+
+    @keyframes softFadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(40px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Navigation */
+    .nav-link {
+      position: fixed;
+      top: 1.5rem;
+      left: 1.5rem;
+      z-index: 100;
+      text-decoration: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.85rem;
+      color: #b07a8e;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      animation: softFadeIn 2s ease-out 0.5s forwards;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: #8e5a6e;
+      transform: translateX(-3px);
+    }
+
+    .nav-link svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Main content */
+    .content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      width: 100%;
+      max-width: 600px;
+      animation: fadeInUp 2s ease-out;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 24px;
+      box-shadow:
+        0 8px 32px rgba(180, 120, 150, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      padding: 2.5rem 2rem;
+    }
+
+    .ornament {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.6;
+    }
+
+    .ornament-line {
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #c48b9f, transparent);
+    }
+
+    .ornament-symbol {
+      font-size: 1.2rem;
+      color: #c48b9f;
+    }
+
+    .page-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.6rem;
+      color: #b07a8e;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+      opacity: 0;
+      animation: softFadeIn 2s ease-out 0.5s forwards;
+    }
+
+    .page-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.9rem;
+      color: #c0a0b0;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: softFadeIn 2s ease-out 0.8s forwards;
+    }
+
+    /* Now playing */
+    .now-playing {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      opacity: 0;
+      animation: softFadeIn 2s ease-out 1s forwards;
+      transition: all 0.5s ease;
+    }
+
+    .now-playing-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.7rem;
+      color: #c0a0b0;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+
+    .now-playing-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-style: italic;
+      color: #5a3d4a;
+      margin-bottom: 0.3rem;
+    }
+
+    .now-playing-artist {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.95rem;
+      color: #a07a8a;
+      letter-spacing: 2px;
+      margin-bottom: 0.8rem;
+    }
+
+    .now-playing-note {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: #b07a8e;
+      margin-top: 0.8rem;
+      line-height: 1.5;
+    }
+
+    /* Spotify embed */
+    .player-embed {
+      margin-top: 1rem;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .player-embed iframe {
+      border: none;
+      border-radius: 12px;
+    }
+
+    /* Vinyl GIF */
+    .vinyl-gif-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 0.8rem;
+    }
+
+    .vinyl-gif-wrap img {
+      width: 160px;
+      height: auto;
+      border-radius: 14px;
+      opacity: 0.85;
+      filter: sepia(0.2) saturate(0.8);
+    }
+
+    /* Song list */
+    .song-list {
+      list-style: none;
+      text-align: left;
+      opacity: 0;
+      animation: softFadeIn 2s ease-out 1.3s forwards;
+    }
+
+    .song-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.9rem 1rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .song-item:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .song-item.active {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .song-item + .song-item {
+      border-top: 1px solid rgba(196, 139, 159, 0.1);
+    }
+
+    .song-number {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.8rem;
+      color: #c0a0b0;
+      min-width: 1.5rem;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+
+    .song-item.active .song-number {
+      color: #e8899a;
+    }
+
+    .song-playing-indicator {
+      display: none;
+    }
+
+    .song-item.active .song-number span {
+      display: none;
+    }
+
+    .song-item.active .song-playing-indicator {
+      display: flex;
+      gap: 2px;
+      align-items: flex-end;
+      height: 12px;
+    }
+
+    .bar {
+      width: 2px;
+      background: #e8899a;
+      border-radius: 1px;
+      animation: barBounce 0.8s ease-in-out infinite alternate;
+    }
+
+    .bar:nth-child(1) { height: 4px; animation-delay: 0s; }
+    .bar:nth-child(2) { height: 8px; animation-delay: 0.2s; }
+    .bar:nth-child(3) { height: 5px; animation-delay: 0.4s; }
+
+    @keyframes barBounce {
+      0% { height: 3px; }
+      100% { height: 12px; }
+    }
+
+    .song-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .song-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      color: #5a3d4a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .song-artist {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.8rem;
+      color: #a07a8a;
+      letter-spacing: 1px;
+      margin-top: 0.15rem;
+    }
+
+    .song-heart {
+      font-size: 0.7rem;
+      color: #e8899a;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .song-item:hover .song-heart,
+    .song-item.active .song-heart {
+      opacity: 1;
+    }
+
+    /* Bottom ornament */
+    .ornament-bottom {
+      margin-top: 2rem;
+      margin-bottom: 0;
+    }
+
+    /* Petal drifting */
+    .petal {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: radial-gradient(ellipse at 30% 30%, #ffb6c1, #ff69b4);
+      border-radius: 50% 0 50% 50%;
+      opacity: 0;
+      animation: petalDrift linear infinite;
+    }
+
+    @keyframes petalDrift {
+      0% { transform: translate(0, -10vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.5; }
+      90% { opacity: 0.5; }
+      100% { transform: translate(100px, 110vh) rotate(720deg); opacity: 0; }
+    }
+
+    .heartbeat {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.2rem;
+      color: #e8899a;
+      z-index: 10;
+      opacity: 0;
+      animation: softFadeIn 2s ease-out 2s forwards, heartPulse 1.5s ease-in-out 2s infinite;
+    }
+
+    @keyframes heartPulse {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      15% { transform: translateX(-50%) scale(1.3); }
+      30% { transform: translateX(-50%) scale(1); }
+      45% { transform: translateX(-50%) scale(1.2); }
+      60% { transform: translateX(-50%) scale(1); }
+    }
+
+    /* Empty state */
+    .empty-state {
+      padding: 2rem 1rem;
+      color: #b07a8e;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-style: italic;
+      letter-spacing: 1px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1.5rem 0.8rem 3rem;
+      }
+      .glass-card {
+        padding: 2rem 1.2rem;
+        border-radius: 18px;
+      }
+      .page-title {
+        font-size: 1.35rem;
+      }
+      .now-playing-title {
+        font-size: 1.1rem;
+      }
+      .song-title {
+        font-size: 0.9rem;
+      }
+      .ornament-line {
+        width: 40px;
+      }
+      .nav-link {
+        top: 1rem;
+        left: 1rem;
+        font-size: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="nav-link">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    back
+  </a>
+
+  <div class="floating-elements" id="floatingElements"></div>
+
+  <div class="content">
+    <div class="glass-card">
+      <div class="ornament">
+        <div class="ornament-line"></div>
+        <div class="ornament-symbol">♫</div>
+        <div class="ornament-line"></div>
+      </div>
+
+      <div class="page-title">Songs that remind me of you 🎵</div>
+      <div class="page-subtitle">our little playlist</div>
+
+      <div class="now-playing" id="nowPlaying">
+        <div class="now-playing-label">♪ now playing</div>
+        <div class="vinyl-gif-wrap">
+          <img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExbXFjNGg1MzduZXl2aWNmdzNiZWZicnF0ODd4em94YW9zcm8wNzFuaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/1cMSWoZlxhO8w/giphy.gif" alt="vinyl record spinning">
+        </div>
+        <div class="now-playing-title" id="npTitle">Select a song...</div>
+        <div class="now-playing-artist" id="npArtist"></div>
+        <div class="player-embed" id="playerEmbed"></div>
+        <div class="now-playing-note" id="npNote"></div>
+      </div>
+
+      <ul class="song-list" id="songList"></ul>
+
+      <div class="ornament ornament-bottom">
+        <div class="ornament-line"></div>
+        <div class="ornament-symbol">&hearts;</div>
+        <div class="ornament-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="heartbeat">&hearts;</div>
+
+  <script>
+    // ─── Playlist ───
+    // Add songs here! Each song needs a title, artist, and spotifyId.
+    // To find a Spotify track ID: open Spotify → right-click a song → Share → Copy Song Link
+    // The ID is the last part of the URL: https://open.spotify.com/track/THIS_IS_THE_ID
+    //
+    // You can also add a personal "note" that will show when the song is playing.
+    const playlist = [
+      {
+        title: "Fade Into You",
+        artist: "Mazzy Star",
+        spotifyId: "1LzNfuep1bnAUR9skqdHCK",
+        note: "This song is the feeling of falling for you — slow, warm, and completely inevitable"
+      },
+      {
+        title: "Iris",
+        artist: "Goo Goo Dolls",
+        spotifyId: "6Qyc6fS4DsZjB2mRW9DsQs?si=1cf4b54e50f4459a",
+        note: "I just want you to know who I am"
+      },
+      {
+        title: "Apocalypse",
+        artist: "Cigarettes After Sex",
+        spotifyId: "0yc6Gst2xkRu0eMLeRMGCX",
+        note: "The kind of quiet that only feels right next to you"
+      },
+      {
+        title: "Risk It All",
+        artist: "Bruno Mars",
+        spotifyId: "5y2ijHECwFYWqcAHKTZgzD",
+        note: "I'd risk it all just to be close to you — every single time"
+      },
+      {
+        title: "Thinkin Bout You",
+        artist: "Frank Ocean",
+        spotifyId: "7DfFc7a6Rwfi3YQMRbDMau",
+        note: "No matter where I am, my mind always finds its way back to you"
+      },
+      {
+        title: "Her Eyes",
+        artist: "Charlie Jeer",
+        spotifyId: "3IdN6RaoBu9L0fwGwfrJ5B",
+        note: "Everything I could never put into words — it's all right there in your eyes"
+      },
+      {
+        title: "WHERE IS MY HUSBAND!",
+        artist: "RAYE",
+        spotifyId: "3bb46U9c7d5IVGYpxlAGgj",
+        note: "This one just makes me smile every time — and so do you"
+      },
+    ];
+
+    // ─── Render ───
+    const songList = document.getElementById('songList');
+    const npTitle = document.getElementById('npTitle');
+    const npArtist = document.getElementById('npArtist');
+    const npNote = document.getElementById('npNote');
+    const playerEmbed = document.getElementById('playerEmbed');
+    let activeIndex = -1;
+
+    function renderPlaylist() {
+      songList.innerHTML = '';
+
+      if (playlist.length === 0) {
+        songList.innerHTML = '<div class="empty-state">Songs are coming soon... ♡</div>';
+        return;
+      }
+
+      playlist.forEach((song, i) => {
+        const li = document.createElement('li');
+        li.className = 'song-item';
+        li.innerHTML = `
+          <div class="song-number">
+            <span>${String(i + 1).padStart(2, '0')}</span>
+            <div class="song-playing-indicator">
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+            </div>
+          </div>
+          <div class="song-info">
+            <div class="song-title">${song.title}</div>
+            <div class="song-artist">${song.artist}</div>
+          </div>
+          <div class="song-heart">♥</div>
+        `;
+        li.addEventListener('click', () => playSong(i));
+        songList.appendChild(li);
+      });
+    }
+
+    function playSong(index) {
+      if (index < 0 || index >= playlist.length) return;
+      activeIndex = index;
+      const song = playlist[index];
+
+      npTitle.textContent = song.title;
+      npArtist.textContent = song.artist;
+      npNote.textContent = song.note || '';
+
+      if (song.spotifyId) {
+        playerEmbed.innerHTML = `<iframe
+          src="https://open.spotify.com/embed/track/${song.spotifyId}?utm_source=generator&theme=0"
+          width="100%" height="152" frameBorder="0"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+          style="border-radius:12px;"></iframe>`;
+      } else {
+        playerEmbed.innerHTML = '';
+      }
+
+      document.querySelectorAll('.song-item').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+      });
+
+      document.getElementById('nowPlaying').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    renderPlaylist();
+
+    if (playlist.length > 0) {
+      playSong(0);
+    }
+
+    // ─── Floating Elements (same as main page) ───
+    const container = document.getElementById('floatingElements');
+    const hearts = ['❤', '♥', '💕', '💗', '💖', '🤍', '🩷'];
+    const flowers = ['🌸', '🌷', '🌺', '🪷', '✿', '❀', '🌹'];
+    const musicEmoji = ['🎵', '🎶', '♪', '♫', '🎧'];
+
+    function randomBetween(a, b) {
+      return Math.random() * (b - a) + a;
+    }
+
+    function createFloatingElement() {
+      const el = document.createElement('div');
+      el.classList.add('floater');
+      const pool = [...hearts, ...flowers, ...musicEmoji];
+      el.textContent = pool[Math.floor(Math.random() * pool.length)];
+
+      const size = randomBetween(0.8, 1.8);
+      const duration = randomBetween(10, 22);
+      const left = randomBetween(0, 100);
+      const delay = randomBetween(0, 8);
+
+      el.style.fontSize = size + 'rem';
+      el.style.left = left + '%';
+      el.style.animationDuration = duration + 's';
+      el.style.animationDelay = delay + 's';
+      el.style.filter = `blur(${randomBetween(0, 1)}px)`;
+
+      container.appendChild(el);
+      setTimeout(() => { el.remove(); createFloatingElement(); }, (duration + delay) * 1000);
+    }
+
+    for (let i = 0; i < 20; i++) createFloatingElement();
+
+    function createSparkle() {
+      const sparkle = document.createElement('div');
+      sparkle.classList.add('sparkle');
+      const duration = randomBetween(8, 16);
+      const left = randomBetween(0, 100);
+      const delay = randomBetween(0, 10);
+      sparkle.style.left = left + '%';
+      sparkle.style.animationDuration = duration + 's';
+      sparkle.style.animationDelay = delay + 's';
+      container.appendChild(sparkle);
+      setTimeout(() => { sparkle.remove(); createSparkle(); }, (duration + delay) * 1000);
+    }
+
+    for (let i = 0; i < 10; i++) createSparkle();
+
+    function createPetal() {
+      const petal = document.createElement('div');
+      petal.classList.add('petal');
+      const duration = randomBetween(12, 25);
+      const left = randomBetween(-5, 105);
+      const delay = randomBetween(0, 15);
+      const size = randomBetween(8, 18);
+      petal.style.width = size + 'px';
+      petal.style.height = size + 'px';
+      petal.style.left = left + '%';
+      petal.style.animationDuration = duration + 's';
+      petal.style.animationDelay = delay + 's';
+      petal.style.background = `radial-gradient(ellipse at 30% 30%,
+        hsl(${randomBetween(330, 360)}, ${randomBetween(60,100)}%, ${randomBetween(75,90)}%),
+        hsl(${randomBetween(330, 360)}, ${randomBetween(60,100)}%, ${randomBetween(55,70)}%))`;
+      container.appendChild(petal);
+      setTimeout(() => { petal.remove(); createPetal(); }, (duration + delay) * 1000);
+    }
+
+    for (let i = 0; i < 8; i++) createPetal();
+  </script>
+</body>
+</html>
