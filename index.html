@@ -16,7 +16,9 @@
 
     body {
       min-height: 100vh;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding-top: 3.25rem;
       font-family: 'Cormorant Garamond', serif;
       display: flex;
       align-items: center;
@@ -258,10 +260,46 @@
       padding: 3.5rem 3rem;
     }
 
+    /* Telegram banner: first thing visible, so it has no fade-in */
+    .telegram-link {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      min-height: 3.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 0.5rem 1rem;
+      background: #8e5a6e;
+      color: #fff;
+      text-decoration: none;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 14px rgba(90, 61, 74, 0.3);
+      transition: background 0.3s ease;
+    }
+
+    .telegram-link:hover,
+    .telegram-link:focus-visible {
+      background: #734657;
+    }
+
+    .telegram-link svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
     /* Playlist nav link */
     .playlist-link {
       position: fixed;
-      top: 1.5rem;
+      top: 4.5rem;
       right: 1.5rem;
       z-index: 100;
       text-decoration: none;
@@ -337,6 +375,11 @@
   </style>
 </head>
 <body>
+  <a href="https://t.me/+AaoRdg9RXaQ3ZmE6" class="telegram-link" target="_blank" rel="noopener noreferrer">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.9 4.3 18.7 19.4c-.2 1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.4-.1-.6-.6-.2L6.2 13.1l-4.8-1.5c-1-.3-1-1 .2-1.5L20.5 2.8c.9-.3 1.6.2 1.4 1.5Z"/></svg>
+    Join on Telegram
+  </a>
+
   <a href="playlist.html" class="playlist-link">
     playlist
     <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
